@@ -1,1 +1,6 @@
-extends: cheminfo-typescript
+root: true
+extends: [cheminfo-typescript, cheminfo-typescript/jsdoc]
+plugins: [jest]
+rules:
+  '@typescript-eslint/restrict-template-expressions': off
+  'jest/no-focused-tests': 'error'
