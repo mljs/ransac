@@ -2,7 +2,7 @@ import { levenbergMarquardt } from 'ml-levenberg-marquardt';
 import Random from 'ml-random';
 import { getPointLineDistance } from './utils/geometry';
 
-import { linearRegression } from './utils/linearRegression';
+import { line, linearRegression } from './utils/linearRegression';
 import { mad } from './utils/mad';
 
 type DistFunction<DataType> = (
@@ -13,11 +13,17 @@ type DistFunction<DataType> = (
 type FitFunction<DataType> = (
   source: DataType[],
   destination: DataType[],
-) => any;
+) => number[];
+
+type ModelFunction<DataType> = (
+  parameters: number[],
+) => (source: DataType[]) => DataType[];
 
 export interface RansacOptions<DataType> {
   /**
-   * Number of elements of the random subset.
+   * Number of elements of the random subset. By default, a linear regression is used, for which the minimal number of values is 2.
+   *
+   * @default 2
    */
   sampleSize: number;
   /**
@@ -41,11 +47,17 @@ export interface RansacOptions<DataType> {
    *
    * @default 100
    */
+  modelFunction?: ModelFunction<DataType>;
+  /**
+   * Maximal number of iterations of the algorithm. Will only be reached if a model never has minNbInliers.
+   *
+   * @default 100
+   */
   maxNbIterations?: number;
   /**
    * Return current model if the number of inliers is bigger or equal to minNbInliers.
    */
-  minNbInliers?: number;
+  minNbInliers: number;
   // TODO: add seed option?
 }
 
@@ -61,10 +73,11 @@ export function ransac<DataType>(
   options: RansacOptions<DataType>,
 ): number {
   const {
-    sampleSize,
-    maxInlierDistance = mad(destination as number[]),
+    sampleSize = 2,
+    maxInlierDistance = 3, // todo: use mad
     fitFunction = linearRegression,
     distanceFunction = getPointLineDistance,
+    modelFunction = line,
     maxNbIterations = 100,
     minNbInliers = getNbValues(options.minNbInliers, source.length),
   } = options;
@@ -74,6 +87,8 @@ export function ransac<DataType>(
   }
 
   let iteration = 0;
+
+  let maxNbInliers = 0;
 
   while (iteration < maxNbIterations) {
     const indices = new Random().choice(sampleSize);
@@ -85,10 +100,20 @@ export function ransac<DataType>(
       dstSubset.push(source[i]);
     }
 
-    const model = levenbergMarquardt(
-      { x: srcSubset as number[], y: dstSubset as number[] },
-      fitFunction,
-    );
+    const modelParameters = fitFunction(srcSubset, dstSubset);
+    const model = modelFunction(modelParameters);
+
+    const predictedDestination: DataType[] = [];
+
+    let nbInliers = 0;
+    for (let i = 0; i < destination.length; i++) {
+      if (i in indices) {
+        nbInliers++;
+        continue;
+      }
+
+      const predictedDestination = model(destination);
+    }
   }
 
   return 42;
