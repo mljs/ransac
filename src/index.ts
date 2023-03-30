@@ -15,9 +15,9 @@ type FitFunction<DataType> = (
   destination: DataType[],
 ) => number[];
 
-type ModelFunction<DataType> = (
-  parameters: number[],
-) => (source: DataType[]) => DataType[];
+type ModelFunction<DataType> = (source: DataType[]) => DataType[];
+
+type ModelCreator<DataType> = (parameters: number[]) => ModelFunction<DataType>;
 
 export interface RansacOptions<DataType> {
   /**
@@ -43,11 +43,11 @@ export interface RansacOptions<DataType> {
    */
   distanceFunction?: DistFunction<DataType>;
   /**
-   * Number of iterations of the RANSAC algorithm.
+   * Function that takes in parameters and outputs a model function.
    *
    * @default 100
    */
-  modelFunction?: ModelFunction<DataType>;
+  modelFunction?: ModelCreator<DataType>;
   /**
    * Maximal number of iterations of the algorithm. Will only be reached if a model never has minNbInliers.
    *
@@ -61,6 +61,17 @@ export interface RansacOptions<DataType> {
   // TODO: add seed option?
 }
 
+export interface RansacOuput<DataType> {
+  /**
+   * Parameters of the model with the most inliers.
+   */
+  modelParameters: number[];
+  /**
+   * Inliers for the best model.
+   */
+  inliers: DataType[];
+}
+
 /**
  * RANdom SAmple Consensus algorithm: find a model matching the data and ignoring outliers.
  * @link https://en.wikipedia.org/wiki/Random_sample_consensus
@@ -71,7 +82,7 @@ export function ransac<DataType>(
   source: DataType[],
   destination: DataType[],
   options: RansacOptions<DataType>,
-): number {
+): RansacOuput<DataType> {
   const {
     sampleSize = 2,
     maxInlierDistance = 3, // todo: use mad
@@ -88,7 +99,9 @@ export function ransac<DataType>(
 
   let iteration = 0;
 
-  let maxNbInliers = 0;
+  let bestNbInliers = 0;
+  let bestInliers: DataType[] = [];
+  let bestModelParameters: number[] = [];
 
   while (iteration < maxNbIterations) {
     const indices = new Random().choice(sampleSize);
@@ -103,20 +116,37 @@ export function ransac<DataType>(
     const modelParameters = fitFunction(srcSubset, dstSubset);
     const model = modelFunction(modelParameters);
 
-    const predictedDestination: DataType[] = [];
+    const predictedDestination: DataType[] = model(destination);
 
     let nbInliers = 0;
+    let inliers: DataType[] = [];
     for (let i = 0; i < destination.length; i++) {
       if (i in indices) {
         nbInliers++;
         continue;
       }
-
-      const predictedDestination = model(destination);
+      const distance = distanceFunction(
+        destination[i],
+        predictedDestination[i],
+      );
+      if (distance < maxInlierDistance) {
+        nbInliers++;
+        inliers.push(source[i]);
+      }
     }
+    if (nbInliers > bestNbInliers) {
+      bestNbInliers = nbInliers;
+      bestInliers = inliers; // potential bug?
+      bestModelParameters = modelParameters;
+      if (nbInliers >= minNbInliers) {
+        return { modelParameters, inliers };
+      }
+    }
+
+    iteration++;
   }
 
-  return 42;
+  return { modelParameters: bestModelParameters, inliers: bestInliers };
 }
 
 function getNbValues(value: number, size: number): number {
