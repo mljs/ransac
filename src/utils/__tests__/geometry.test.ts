@@ -4,6 +4,7 @@ expect.extend({ toMatchCloseTo });
 import {
   getIntersectionPoint,
   getPerpendicularThroughPoint,
+  getPointLineDistance,
   Line,
   Point,
 } from '../geometry';
@@ -71,5 +72,28 @@ describe('getIntersectionPoint', () => {
     expect(getIntersectionPoint(line1, line2)).toMatchCloseTo(
       getIntersectionPoint(line2, line1),
     );
+  });
+});
+
+describe('getPointLineDistance', () => {
+  it('point on horizontal line', () => {
+    const line: Line = { slope: 0, offset: 0 };
+    const point: Point = { x: 0, y: 0 };
+    expect(getPointLineDistance(point, line)).toStrictEqual(0);
+  });
+  it('point on vertical line', () => {
+    const line: Line = { x: 3.5 };
+    const point: Point = { x: 3.5, y: 10 };
+    expect(getPointLineDistance(point, line)).toStrictEqual(0);
+  });
+  it('distance of 1', () => {
+    const line: Line = { x: 3.5 };
+    const point: Point = { x: 4.5, y: 10 };
+    expect(getPointLineDistance(point, line)).toStrictEqual(1);
+  });
+  it.only('distance to tilted line', () => {
+    const line: Line = { slope: 1, offset: 3 };
+    const point: Point = { x: 2, y: 3 };
+    expect(getPointLineDistance(point, line)).toStrictEqual(Math.sqrt(2));
   });
 });

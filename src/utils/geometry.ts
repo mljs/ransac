@@ -63,7 +63,9 @@ export function getEuclidianDistance(point1: Point, point2: Point): number {
 
 export function getPointLineDistance(point: Point, line: Line): number {
   const perpendicular = getPerpendicularThroughPoint(line, point);
+  console.log(perpendicular);
   const intersection = getIntersectionPoint(line, perpendicular);
+  console.log(intersection);
 
   return getEuclidianDistance(point, intersection);
 }
