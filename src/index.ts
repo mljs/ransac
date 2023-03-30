@@ -1,4 +1,9 @@
+import { levenbergMarquardt } from 'ml-levenberg-marquardt';
 import Random from 'ml-random';
+import { getPointLineDistance } from './utils/geometry';
+
+import { linearRegression } from './utils/linearRegression';
+import { mad } from './utils/mad';
 
 type DistFunction<DataType> = (
   source: DataType,
@@ -16,23 +21,32 @@ export interface RansacOptions<DataType> {
    */
   sampleSize: number;
   /**
-   * Maximal distance between model and inliers.
+   * Maximal distance between model and inliers. The points for which the distance is equal to maxDistance are considered inliers.
+   *
+   * @default The median absolute deviation of the initial subset values to the model.
    */
-  maxDistance: number;
+  maxInlierDistance: number;
   /**
    * Fitting function.
+   *
+   * @default Linear regression.
    */
-  fitFunction: FitFunction<DataType>;
+  fitFunction?: FitFunction<DataType>;
   /**
-   * Function used to compute the distance between two values.
+   * Function used to compute the distance from model to the value.
    */
-  distanceFunction: DistFunction<DataType>;
+  distanceFunction?: DistFunction<DataType>;
   /**
    * Number of iterations of the RANSAC algorithm.
    *
-   * @default 10
+   * @default 100
    */
-  nbIterations: number;
+  maxNbIterations?: number;
+  /**
+   * Return current model if the number of inliers is bigger or equal to minNbInliers.
+   */
+  minNbInliers?: number;
+  // TODO: add seed option?
 }
 
 /**
@@ -46,20 +60,44 @@ export function ransac<DataType>(
   destination: DataType[],
   options: RansacOptions<DataType>,
 ): number {
-  const { sampleSize, maxDistance, fitFunction, distanceFunction } = options;
+  const {
+    sampleSize,
+    maxInlierDistance = mad(destination as number[]),
+    fitFunction = linearRegression,
+    distanceFunction = getPointLineDistance,
+    maxNbIterations = 100,
+    minNbInliers = getNbValues(options.minNbInliers, source.length),
+  } = options;
 
   if (source.length !== destination.length) {
     throw new Error('source and destination data should have the same length');
   }
 
-  const indices = new Random().choice(sampleSize);
+  let iteration = 0;
 
-  const srcSubset = [];
-  const dstSubset = [];
-  for (let i of indices) {
-    srcSubset.push(source[i]);
-    dstSubset.push(source[i]);
+  while (iteration < maxNbIterations) {
+    const indices = new Random().choice(sampleSize);
+
+    const srcSubset = [];
+    const dstSubset = [];
+    for (let i of indices) {
+      srcSubset.push(source[i]);
+      dstSubset.push(source[i]);
+    }
+
+    const model = levenbergMarquardt(
+      { x: srcSubset as number[], y: dstSubset as number[] },
+      fitFunction,
+    );
   }
 
   return 42;
+}
+
+function getNbValues(value: number, size: number): number {
+  if (Number.isInteger(value)) {
+    return value;
+  } else {
+    return Math.ceil(value * size);
+  }
 }
