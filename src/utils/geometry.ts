@@ -14,6 +14,12 @@ export interface Point {
   y: number;
 }
 
+/**
+ * Line perpendicular to the given line and going through the point.
+ * @param line Initial line.
+ * @param point Point to go through.
+ * @returns Perpendicular lien.
+ */
 export function getPerpendicularThroughPoint(line: Line, point: Point): Line {
   if ('x' in line) {
     return { slope: 0, offset: point.y };
@@ -24,9 +30,23 @@ export function getPerpendicularThroughPoint(line: Line, point: Point): Line {
   }
 }
 
+function intersectionOneVertical(
+  vertical: VerticalLine,
+  notVertical: NotVerticalLine,
+): Point {
+  return {
+    x: vertical.x,
+    y: notVertical.slope * vertical.x + notVertical.offset,
+  };
+}
+
 export function getIntersectionPoint(line1: Line, line2: Line): Point {
   if ('x' in line1 && 'x' in line2) {
-    return { slope: 0, offset: point.y };
+    throw new Error('The lines are parallel.');
+  } else if ('x' in line1) {
+    return intersectionOneVertical(line1, line2 as NotVerticalLine); // is there a bug?
+  } else if ('x' in line2) {
+    return intersectionOneVertical(line2, line1);
   } else {
     return {
       x: (line2.offset - line1.offset) / (line1.slope - line2.slope),
