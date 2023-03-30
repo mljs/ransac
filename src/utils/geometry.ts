@@ -1,5 +1,3 @@
-import { line } from './linearRegression';
-
 export interface NotVerticalLine {
   slope: number;
   offset: number;
@@ -39,5 +37,13 @@ export function getIntersectionPoint(line1: Line, line2: Line): Point {
   }
 }
 
-export function getPointLineDistance(point: Point, line: Line): number {}
-ﬁ;
+export function getEuclidianDistance(point1: Point, point2: Point): number {
+  return Math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2);
+}
+
+export function getPointLineDistance(point: Point, line: Line): number {
+  const perpendicular = getPerpendicularThroughPoint(line, point);
+  const intersection = getIntersectionPoint(line, perpendicular);
+
+  return getEuclidianDistance(point, intersection);
+}
