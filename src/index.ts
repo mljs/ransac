@@ -26,7 +26,7 @@ export interface RansacOptions<DataType> {
    *
    * @default The median absolute deviation of the initial subset values to the model.
    */
-  threshold: number;
+  threshold?: number;
   /**
    * Fitting function.
    *
@@ -102,9 +102,13 @@ export function ransac<DataType>(
   //   modelFunction = line,
   //   maxNbIterations = 100,
   //   minNbInliers = getNbValues(options.minNbInliers, source.length),
-  // } = options;
+  // } = options
+
+  let minNbInliers = 0;
   if (options.minNbInliers) {
-    console.log('hey');
+    minNbInliers = getNbValues(options.minNbInliers, source.length);
+  } else {
+    minNbInliers = source.length;
   }
 
   const {
@@ -114,9 +118,6 @@ export function ransac<DataType>(
     distanceFunction,
     modelFunction,
     maxNbIterations = 100,
-    minNbInliers = options.minNbInliers
-      ? getNbValues(options.minNbInliers, source.length)
-      : source.length,
     seed = undefined,
   } = options;
 
@@ -136,7 +137,6 @@ export function ransac<DataType>(
       size: maxNbIterations,
     });
   }
-
   while (iteration < maxNbIterations) {
     iteration++;
 
@@ -151,8 +151,6 @@ export function ransac<DataType>(
         size: sampleSize,
       });
     }
-
-    console.log(indices);
 
     const srcSubset: DataType[] = [];
     const dstSubset: DataType[] = [];
@@ -206,7 +204,6 @@ export function ransac<DataType>(
 }
 
 function getNbValues(value: number, size: number): number {
-  console.log('AAAA');
   if (Number.isInteger(value)) {
     return value;
   } else {

@@ -57,23 +57,21 @@ test('horizontal line', () => {
   });
 });
 
-test('minNbInliers = 5', () => {
+test('minNbInliers = 3', () => {
   const source = [0, 1, 2, 3, 4, 5];
-  const destination = [1, 2, 3, 4, 5, 6];
+  const destination = [1, 2, 3, 4, 5, 0];
 
   const result = ransac(source, destination, {
     distanceFunction,
     fitFunction,
     modelFunction,
-    threshold: 1.1,
-    sampleSize: 2,
-    maxNbIterations: 100,
+    minNbInliers: 3,
   });
 
   expect(result).toMatchCloseTo({
     nbIterations: 1,
     modelParameters: [1, 1],
-    inliers: [0, 1, 2, 3, 4, 5],
+    inliers: [0, 1, 2, 3, 4],
   });
 });
 
