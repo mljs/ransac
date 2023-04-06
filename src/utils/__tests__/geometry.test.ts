@@ -1,5 +1,4 @@
-import { toBeDeepCloseTo, toMatchCloseTo } from 'jest-matcher-deep-close-to';
-expect.extend({ toMatchCloseTo });
+import { toMatchCloseTo } from 'jest-matcher-deep-close-to';
 
 import {
   getIntersectionPoint,
@@ -8,6 +7,8 @@ import {
   Line,
   Point,
 } from '../geometry';
+
+expect.extend({ toMatchCloseTo });
 
 describe('getPerpendicularThroughPoint', () => {
   it('horizontal line', () => {
@@ -91,7 +92,7 @@ describe('getPointLineDistance', () => {
     const point: Point = { x: 4.5, y: 10 };
     expect(getPointLineDistance(point, line)).toStrictEqual(1);
   });
-  it.only('distance to tilted line', () => {
+  it('distance to tilted line', () => {
     const line: Line = { slope: 1, offset: 3 };
     const point: Point = { x: 2, y: 3 };
     expect(getPointLineDistance(point, line)).toStrictEqual(Math.sqrt(2));

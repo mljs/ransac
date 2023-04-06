@@ -1,9 +1,8 @@
 import Random from 'ml-random';
 
 type DistFunction<DataType> = (
-  source: DataType,
-  destination: DataType,
-  model: ModelFunction<DataType>,
+  value: DataType,
+  predictedValue: DataType,
 ) => number;
 
 type FitFunction<DataType> = (
@@ -59,15 +58,15 @@ export interface RansacOptions<DataType> {
   // TODO: add seed option?
 }
 
-export interface RansacOuput<DataType> {
+export interface RansacOuput {
   /**
    * Parameters of the model with the most inliers.
    */
   modelParameters: number[];
   /**
-   * Inliers for the best model.
+   * Indices of the inliers for the best model.
    */
-  inliers: DataType[];
+  inliers: number[];
 }
 
 /**
@@ -83,7 +82,7 @@ export function ransac<DataType>(
   source: DataType[],
   destination: DataType[],
   options: RansacOptions<DataType>,
-): RansacOuput<DataType> {
+): RansacOuput {
   // todo: handle default options!!
   // const {
   //   sampleSize = 2,
@@ -114,20 +113,22 @@ export function ransac<DataType>(
   let iteration = 0;
 
   let bestNbInliers = 0;
-  let bestInliers: DataType[] = [];
+  let bestInliers: number[] = [];
   let bestModelParameters: number[] = [];
 
   while (iteration < maxNbIterations) {
-    const indices = new Random().choice(sampleSize);
+    const indices = new Random().choice(sampleSize, { size: sampleSize });
 
     const srcSubset: DataType[] = [];
     const dstSubset: DataType[] = [];
     for (let i of indices) {
       srcSubset.push(source[i]);
-      dstSubset.push(source[i]);
+      dstSubset.push(destination[i]);
     }
 
     const modelParameters = fitFunction(srcSubset, dstSubset);
+
+    console.log({ modelParameters });
     const model = modelFunction(modelParameters);
     let predictedDestination: DataType[] = [];
     for (let value of destination) {
@@ -135,16 +136,19 @@ export function ransac<DataType>(
     }
 
     let nbInliers = 0;
-    let inliers: DataType[] = [];
+    let inliers: number[] = [];
     for (let i = 0; i < destination.length; i++) {
       if (i in indices) {
         nbInliers++;
         continue;
       }
-      const distance = distanceFunction(source[i], destination[i], model);
+      const distance = distanceFunction(
+        destination[i],
+        predictedDestination[i],
+      );
       if (distance < threshold) {
         nbInliers++;
-        inliers.push(source[i]);
+        inliers.push(i);
       }
     }
     if (nbInliers > bestNbInliers) {

@@ -1,5 +1,4 @@
 import { ransac } from '..';
-import { getPointLineDistance, Line } from '../utils/geometry';
 import { line, linearRegression } from '../utils/linearRegression';
 
 const fitFunction = linearRegression;
@@ -8,18 +7,12 @@ const modelFunction = line;
 /**
  * Compute distance from data to model.
  *
- * @param source - Source value.
- * @param destination - Destination value.
- * @param model - Line model.
+ * @param value - Destination value.
+ * @param predictedValue - Predicted value.
  * @returns Euclidian distance between data and model.
  */
-function distanceFunction(
-  source: number,
-  destination: number,
-  model: Line,
-): number {
-  const point = { x: source, y: destination };
-  return getPointLineDistance(point, model);
+function distanceFunction(value: number, predictedValue: number): number {
+  return Math.abs(value - predictedValue);
 }
 
 test('horizontal line', () => {
@@ -31,9 +24,16 @@ test('horizontal line', () => {
     fitFunction,
     modelFunction,
     threshold: 1,
+    sampleSize: 2,
+    maxNbIterations: 3,
   });
 
-  expect(result).toBe({});
+  console.log(result);
+
+  expect(result).toBe({
+    modelParameters: [0, 0],
+    inliers: [0, 2, 3, 4, 5, 6, 7, 8, 9],
+  });
 });
 
 // test('different length error', () => {
