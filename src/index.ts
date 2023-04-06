@@ -55,7 +55,13 @@ export interface RansacOptions<DataType> {
    * @returns source.length
    */
   minNbInliers?: number;
-  // TODO: add seed option?
+
+  /**
+   * Seed for the random indices of the sample.
+   *
+   * @default undefined
+   */
+  seed?: number;
 }
 
 export interface RansacOuput {
@@ -67,6 +73,10 @@ export interface RansacOuput {
    * Indices of the inliers for the best model.
    */
   inliers: number[];
+  /**
+   * Number of iterations of the ransac algorithm that were made.
+   */
+  nbIterations: number;
 }
 
 /**
@@ -93,10 +103,13 @@ export function ransac<DataType>(
   //   maxNbIterations = 100,
   //   minNbInliers = getNbValues(options.minNbInliers, source.length),
   // } = options;
+  if (options.minNbInliers) {
+    console.log('hey');
+  }
 
   const {
     sampleSize = 2,
-    threshold = 3, // todo: use mad
+    threshold = 3,
     fitFunction,
     distanceFunction,
     modelFunction,
@@ -104,6 +117,7 @@ export function ransac<DataType>(
     minNbInliers = options.minNbInliers
       ? getNbValues(options.minNbInliers, source.length)
       : source.length,
+    seed = undefined,
   } = options;
 
   if (source.length !== destination.length) {
@@ -116,8 +130,29 @@ export function ransac<DataType>(
   let bestInliers: number[] = [];
   let bestModelParameters: number[] = [];
 
+  let seeds: number[] = [];
+  if (seed !== undefined) {
+    seeds = new Random(seed).choice(source.length, {
+      size: maxNbIterations,
+    });
+  }
+
   while (iteration < maxNbIterations) {
-    const indices = new Random().choice(source.length, { size: sampleSize });
+    iteration++;
+
+    let indices: number[];
+
+    if (seed !== undefined) {
+      indices = new Random(seeds[iteration]).choice(source.length, {
+        size: sampleSize,
+      });
+    } else {
+      indices = new Random().choice(source.length, {
+        size: sampleSize,
+      });
+    }
+
+    console.log(indices);
 
     const srcSubset: DataType[] = [];
     const dstSubset: DataType[] = [];
@@ -158,17 +193,20 @@ export function ransac<DataType>(
       bestInliers = inliers; // potential bug with pointers?
       bestModelParameters = modelParameters;
       if (nbInliers >= minNbInliers) {
-        return { modelParameters, inliers };
+        return { modelParameters, inliers, nbIterations: iteration };
       }
     }
-
-    iteration++;
   }
 
-  return { modelParameters: bestModelParameters, inliers: bestInliers };
+  return {
+    modelParameters: bestModelParameters,
+    inliers: bestInliers,
+    nbIterations: maxNbIterations,
+  };
 }
 
 function getNbValues(value: number, size: number): number {
+  console.log('AAAA');
   if (Number.isInteger(value)) {
     return value;
   } else {
