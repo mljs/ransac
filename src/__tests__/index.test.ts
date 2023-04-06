@@ -46,14 +46,32 @@ test('horizontal line', () => {
     modelFunction,
     threshold: 1.1,
     sampleSize: 2,
-    maxNbIterations: 3,
+    maxNbIterations: 10,
     seed: 0,
   });
 
   expect(result).toMatchCloseTo({
-    nbIterations: 3,
+    nbIterations: 10,
     modelParameters: [0, 0],
     inliers: [2, 4, 5, 6, 7, 8, 9, 10, 11],
+  });
+});
+
+test('diagonal line (slope = -1/2, offset = 2)', () => {
+  const source = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const destination = [2, 5, 1, -2, 0, -0.5, -1.5, -1, -2, 1];
+
+  const result = ransac(source, destination, {
+    distanceFunction,
+    fitFunction,
+    modelFunction,
+    seed: 0,
+  });
+
+  expect(result).toMatchCloseTo({
+    nbIterations: 100,
+    modelParameters: [-0.5, 2],
+    inliers: [0, 2, 4, 5, 6, 7, 8],
   });
 });
 
@@ -66,10 +84,11 @@ test('minNbInliers = 3', () => {
     fitFunction,
     modelFunction,
     minNbInliers: 3,
+    seed: 0,
   });
 
   expect(result).toMatchCloseTo({
-    nbIterations: 1,
+    nbIterations: 2,
     modelParameters: [1, 1],
     inliers: [0, 1, 2, 3, 4],
   });

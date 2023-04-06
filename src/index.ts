@@ -17,6 +17,7 @@ type ModelCreator<DataType> = (parameters: number[]) => ModelFunction<DataType>;
 export interface RansacOptions<DataType> {
   /**
    * Number of elements of the random subset. By default, a linear regression is used, for which the minimal number of values is 2.
+   * If another model is used, the minimal value of sampleSize is determined by the minimal number of values necessary to determine the model.
    *
    * @default 2
    */
@@ -113,7 +114,7 @@ export function ransac<DataType>(
 
   const {
     sampleSize = 2,
-    threshold = 3,
+    threshold = 1,
     fitFunction,
     distanceFunction,
     modelFunction,
@@ -133,7 +134,7 @@ export function ransac<DataType>(
 
   let seeds: number[] = [];
   if (seed !== undefined) {
-    seeds = new Random(seed).choice(source.length, {
+    seeds = new Random(seed).choice(maxNbIterations, {
       size: maxNbIterations,
     });
   }
