@@ -117,7 +117,7 @@ export function ransac<DataType>(
   let bestModelParameters: number[] = [];
 
   while (iteration < maxNbIterations) {
-    const indices = new Random().choice(sampleSize, { size: sampleSize });
+    const indices = new Random().choice(source.length, { size: sampleSize });
 
     const srcSubset: DataType[] = [];
     const dstSubset: DataType[] = [];
@@ -128,24 +128,26 @@ export function ransac<DataType>(
 
     const modelParameters = fitFunction(srcSubset, dstSubset);
 
-    console.log({ modelParameters });
     const model = modelFunction(modelParameters);
     let predictedDestination: DataType[] = [];
-    for (let value of destination) {
+    for (let value of source) {
       predictedDestination.push(model(value));
     }
 
     let nbInliers = 0;
     let inliers: number[] = [];
     for (let i = 0; i < destination.length; i++) {
-      if (i in indices) {
+      if (indices.includes(i)) {
         nbInliers++;
+        inliers.push(i);
         continue;
       }
+
       const distance = distanceFunction(
         destination[i],
         predictedDestination[i],
       );
+
       if (distance < threshold) {
         nbInliers++;
         inliers.push(i);
@@ -153,7 +155,7 @@ export function ransac<DataType>(
     }
     if (nbInliers > bestNbInliers) {
       bestNbInliers = nbInliers;
-      bestInliers = inliers; // potential bug?
+      bestInliers = inliers; // potential bug with pointers?
       bestModelParameters = modelParameters;
       if (nbInliers >= minNbInliers) {
         return { modelParameters, inliers };
