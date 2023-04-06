@@ -1,6 +1,8 @@
 import arrayMedian from 'ml-array-median';
 import Random from 'ml-random';
 
+import { getNbIterations } from './utils/getNbIterations';
+
 type DistFunction<DataType> = (
   value: DataType,
   predictedValue: DataType,
@@ -15,7 +17,7 @@ type ModelFunction<DataType> = (source: DataType) => DataType;
 
 type ModelCreator<DataType> = (parameters: number[]) => ModelFunction<DataType>;
 
-export interface RansacOptions<DataType> {
+export interface RansacBaseOptions<DataType> {
   /**
    * Number of elements of the random subset. By default, a linear regression is used, for which the minimal number of values is 2.
    * If another model is used, the minimal value of sampleSize is determined by the minimal number of values necessary to determine the model.
@@ -45,12 +47,7 @@ export interface RansacOptions<DataType> {
    * @default 100
    */
   modelFunction: ModelCreator<DataType>;
-  /**
-   * Maximal number of iterations of the algorithm. Will only be reached if a model never has minNbInliers.
-   *
-   * @default 100
-   */
-  maxNbIterations?: number;
+
   /**
    * Return current model if the number of inliers is bigger or equal to minNbInliers.
    *
@@ -65,6 +62,36 @@ export interface RansacOptions<DataType> {
    */
   seed?: number;
 }
+
+export interface RansacProbabilityOptions<DataType>
+  extends RansacBaseOptions<DataType> {
+  /**
+   * Stop iterating when enough iterations were made to have the givem probability that the best match has been found.
+   * Probability should be a number between 0 and 1.
+   *
+   * @default 0.99
+   */
+  stopProbabilty?: number;
+  /**
+   * If known, specify the fraction of all the values that are outliers (estimatimation).
+   * Value between 0 and 1.
+   */
+  outliersFraction: number;
+}
+
+export interface RansacNbIterationsOptions<DataType>
+  extends RansacBaseOptions<DataType> {
+  /**
+   * Maximal number of iterations of the algorithm. Will only be reached if a model never has minNbInliers.
+   *
+   * @default 100
+   */
+  maxNbIterations?: number;
+}
+
+export type RansacOptions<DataType> =
+  | RansacNbIterationsOptions<DataType>
+  | RansacProbabilityOptions<DataType>;
 
 export interface RansacOuput {
   /**
@@ -123,12 +150,23 @@ export function ransac<DataType>(
     fitFunction,
     distanceFunction,
     modelFunction,
-    maxNbIterations = 100,
     seed = undefined,
   } = options;
 
   if (source.length !== destination.length) {
     throw new Error('source and destination data should have the same length');
+  }
+
+  let maxNbIterations: number;
+  if ('outliersFraction' in options) {
+    const { stopProbabilty = 0.99 } = options;
+    maxNbIterations = getNbIterations(
+      stopProbabilty,
+      options.outliersFraction,
+      sampleSize,
+    );
+  } else {
+    maxNbIterations = options.maxNbIterations ? options.maxNbIterations : 100;
   }
 
   let iteration = 0;

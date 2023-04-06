@@ -119,6 +119,23 @@ test('minNbInliers = 0.5', () => {
   });
 });
 
+test('outliersFraction = 0.5', () => {
+  const source = [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const destination = [-6, -2, 0, 5, 0, 0, -1, 1, 0, 0, -1, 0, 3];
+
+  const result = ransac(source, destination, {
+    distanceFunction,
+    fitFunction,
+    modelFunction,
+    threshold: 1.1,
+    sampleSize: 2,
+    outliersFraction: 0.5,
+    seed: 0,
+  });
+
+  expect(result.nbIterations).toBe(17);
+});
+
 test('different length error', () => {
   const source = [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   const destination = [-6, -2, 0];
