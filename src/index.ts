@@ -1,3 +1,4 @@
+import arrayMedian from 'ml-array-median';
 import Random from 'ml-random';
 
 type DistFunction<DataType> = (
@@ -78,6 +79,10 @@ export interface RansacOuput {
    * Number of iterations of the ransac algorithm that were made.
    */
   nbIterations: number;
+  /**
+   * Median distance from destination to model.
+   */
+  error: number;
 }
 
 /**
@@ -131,6 +136,7 @@ export function ransac<DataType>(
   let bestNbInliers = 0;
   let bestInliers: number[] = [];
   let bestModelParameters: number[] = [];
+  let bestError = 0;
 
   let seeds: number[] = [];
   if (seed !== undefined) {
@@ -170,6 +176,8 @@ export function ransac<DataType>(
 
     let nbInliers = 0;
     let inliers: number[] = [];
+    let distances: number[] = [];
+    let error = 0;
     for (let i = 0; i < destination.length; i++) {
       if (indices.includes(i)) {
         nbInliers++;
@@ -182,17 +190,22 @@ export function ransac<DataType>(
         predictedDestination[i],
       );
 
+      distances.push(distance);
+
       if (distance < threshold) {
         nbInliers++;
         inliers.push(i);
       }
     }
+    error = arrayMedian(distances);
+
     if (nbInliers > bestNbInliers) {
       bestNbInliers = nbInliers;
       bestInliers = inliers; // potential bug with pointers?
       bestModelParameters = modelParameters;
+      bestError = error;
       if (nbInliers >= minNbInliers) {
-        return { modelParameters, inliers, nbIterations: iteration };
+        return { modelParameters, inliers, nbIterations: iteration, error };
       }
     }
   }
@@ -201,6 +214,7 @@ export function ransac<DataType>(
     modelParameters: bestModelParameters,
     inliers: bestInliers,
     nbIterations: maxNbIterations,
+    error: bestError,
   };
 }
 

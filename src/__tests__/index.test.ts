@@ -54,6 +54,7 @@ test('horizontal line', () => {
     nbIterations: 10,
     modelParameters: [0, 0],
     inliers: [2, 4, 5, 6, 7, 8, 9, 10, 11],
+    error: 1,
   });
 });
 
@@ -72,6 +73,7 @@ test('diagonal line (slope = -1/2, offset = 2)', () => {
     nbIterations: 100,
     modelParameters: [-0.5, 2],
     inliers: [0, 2, 4, 5, 6, 7, 8],
+    error: 0.5,
   });
 });
 
@@ -91,6 +93,7 @@ test('minNbInliers = 3', () => {
     nbIterations: 2,
     modelParameters: [1, 1],
     inliers: [0, 1, 2, 3, 4],
+    error: 0,
   });
 });
 
@@ -112,6 +115,7 @@ test('minNbInliers = 0.5', () => {
     nbIterations: 1,
     modelParameters: [1, 1],
     inliers: [0, 1, 2, 3, 4, 5],
+    error: 0,
   });
 });
 
