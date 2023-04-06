@@ -16,8 +16,9 @@ export interface Point {
 
 /**
  * Line perpendicular to the given line and going through the point.
- * @param line Initial line.
- * @param point Point to go through.
+ *
+ * @param line - Initial line.
+ * @param point - Point to go through.
  * @returns Perpendicular lien.
  */
 export function getPerpendicularThroughPoint(line: Line, point: Point): Line {
@@ -40,6 +41,11 @@ function intersectionOneVertical(
   };
 }
 
+/**
+ *
+ * @param line1
+ * @param line2
+ */
 export function getIntersectionPoint(line1: Line, line2: Line): Point {
   if ('x' in line1 && 'x' in line2) {
     throw new Error('The lines are parallel.');
@@ -57,15 +63,23 @@ export function getIntersectionPoint(line1: Line, line2: Line): Point {
   }
 }
 
+/**
+ *
+ * @param point1
+ * @param point2
+ */
 export function getEuclidianDistance(point1: Point, point2: Point): number {
   return Math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2);
 }
 
+/**
+ *
+ * @param point
+ * @param line
+ */
 export function getPointLineDistance(point: Point, line: Line): number {
   const perpendicular = getPerpendicularThroughPoint(line, point);
-  console.log(perpendicular);
   const intersection = getIntersectionPoint(line, perpendicular);
-  console.log(intersection);
 
   return getEuclidianDistance(point, intersection);
 }

@@ -1,13 +1,9 @@
-import { levenbergMarquardt } from 'ml-levenberg-marquardt';
 import Random from 'ml-random';
-import { getPointLineDistance } from './utils/geometry';
-
-import { line, linearRegression } from './utils/linearRegression';
-import { mad } from './utils/mad';
 
 type DistFunction<DataType> = (
   source: DataType,
   destination: DataType,
+  model: ModelFunction<DataType>,
 ) => number;
 
 type FitFunction<DataType> = (
@@ -15,7 +11,7 @@ type FitFunction<DataType> = (
   destination: DataType[],
 ) => number[];
 
-type ModelFunction<DataType> = (source: DataType[]) => DataType[];
+type ModelFunction<DataType> = (source: DataType) => DataType;
 
 type ModelCreator<DataType> = (parameters: number[]) => ModelFunction<DataType>;
 
@@ -25,29 +21,29 @@ export interface RansacOptions<DataType> {
    *
    * @default 2
    */
-  sampleSize: number;
+  sampleSize?: number;
   /**
-   * Maximal distance between model and inliers. The points for which the distance is equal to maxDistance are considered inliers.
+   * Maximal distance between model and inliers. The points for which the distance is equal to threshold are considered inliers.
    *
    * @default The median absolute deviation of the initial subset values to the model.
    */
-  maxInlierDistance: number;
+  threshold: number;
   /**
    * Fitting function.
    *
    * @default Linear regression.
    */
-  fitFunction?: FitFunction<DataType>;
+  fitFunction: FitFunction<DataType>;
   /**
    * Function used to compute the distance from model to the value.
    */
-  distanceFunction?: DistFunction<DataType>;
+  distanceFunction: DistFunction<DataType>;
   /**
    * Function that takes in parameters and outputs a model function.
    *
    * @default 100
    */
-  modelFunction?: ModelCreator<DataType>;
+  modelFunction: ModelCreator<DataType>;
   /**
    * Maximal number of iterations of the algorithm. Will only be reached if a model never has minNbInliers.
    *
@@ -56,8 +52,10 @@ export interface RansacOptions<DataType> {
   maxNbIterations?: number;
   /**
    * Return current model if the number of inliers is bigger or equal to minNbInliers.
+   *
+   * @returns source.length
    */
-  minNbInliers: number;
+  minNbInliers?: number;
   // TODO: add seed option?
 }
 
@@ -73,24 +71,40 @@ export interface RansacOuput<DataType> {
 }
 
 /**
- * RANdom SAmple Consensus algorithm: find a model matching the data and ignoring outliers.
- * @link https://en.wikipedia.org/wiki/Random_sample_consensus
+ * RANdom SAmple Consensus algorithm: find the best model matching the data and ignoring outliers.
  *
- * @returns A very important number
+ * @see https://en.wikipedia.org/wiki/Random_sample_consensus
+ * @param source - The source data.
+ * @param destination - The destination data.
+ * @param options - RANSAC options.
+ * @returns The model parameters and the corresponding inliers.
  */
 export function ransac<DataType>(
   source: DataType[],
   destination: DataType[],
   options: RansacOptions<DataType>,
 ): RansacOuput<DataType> {
+  // todo: handle default options!!
+  // const {
+  //   sampleSize = 2,
+  //   maxInlierDistance = 3, // todo: use mad
+  //   fitFunction = linearRegression,
+  //   distanceFunction = getPointLineDistance,
+  //   modelFunction = line,
+  //   maxNbIterations = 100,
+  //   minNbInliers = getNbValues(options.minNbInliers, source.length),
+  // } = options;
+
   const {
     sampleSize = 2,
-    maxInlierDistance = 3, // todo: use mad
-    fitFunction = linearRegression,
-    distanceFunction = getPointLineDistance,
-    modelFunction = line,
+    threshold = 3, // todo: use mad
+    fitFunction,
+    distanceFunction,
+    modelFunction,
     maxNbIterations = 100,
-    minNbInliers = getNbValues(options.minNbInliers, source.length),
+    minNbInliers = options.minNbInliers
+      ? getNbValues(options.minNbInliers, source.length)
+      : source.length,
   } = options;
 
   if (source.length !== destination.length) {
@@ -106,8 +120,8 @@ export function ransac<DataType>(
   while (iteration < maxNbIterations) {
     const indices = new Random().choice(sampleSize);
 
-    const srcSubset = [];
-    const dstSubset = [];
+    const srcSubset: DataType[] = [];
+    const dstSubset: DataType[] = [];
     for (let i of indices) {
       srcSubset.push(source[i]);
       dstSubset.push(source[i]);
@@ -115,8 +129,10 @@ export function ransac<DataType>(
 
     const modelParameters = fitFunction(srcSubset, dstSubset);
     const model = modelFunction(modelParameters);
-
-    const predictedDestination: DataType[] = model(destination);
+    let predictedDestination: DataType[] = [];
+    for (let value of destination) {
+      predictedDestination.push(model(value));
+    }
 
     let nbInliers = 0;
     let inliers: DataType[] = [];
@@ -125,11 +141,8 @@ export function ransac<DataType>(
         nbInliers++;
         continue;
       }
-      const distance = distanceFunction(
-        destination[i],
-        predictedDestination[i],
-      );
-      if (distance < maxInlierDistance) {
+      const distance = distanceFunction(source[i], destination[i], model);
+      if (distance < threshold) {
         nbInliers++;
         inliers.push(source[i]);
       }
