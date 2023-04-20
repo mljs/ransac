@@ -126,17 +126,6 @@ export function ransac<DataType>(
   destination: DataType[],
   options: RansacOptions<DataType>,
 ): RansacOuput {
-  // todo: handle default options!!
-  // const {
-  //   sampleSize = 2,
-  //   maxInlierDistance = 3, // todo: use mad
-  //   fitFunction = linearRegression,
-  //   distanceFunction = getPointLineDistance,
-  //   modelFunction = line,
-  //   maxNbIterations = 100,
-  //   minNbInliers = getNbValues(options.minNbInliers, source.length),
-  // } = options
-
   let minNbInliers = 0;
   if (options.minNbInliers) {
     minNbInliers = getNbValues(options.minNbInliers, source.length);
