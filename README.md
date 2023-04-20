@@ -9,15 +9,68 @@ Fit a model to noisy data by excluding outliers. This is an implementation of th
 
 ## Installation
 
-`$ npm i ml-ml-ransac`
+`$ npm i ml-ransac`
 
-## Usage
+## Examples
+
+Finding the best linear regression which doesn't take the outliers into account:
 
 ```js
-import { myModule } from 'ml-ml-ransac';
+import { levenbergMarquardt } from 'ml-levenberg-marquardt'; // library allowing you to find a regression of any type
+import { ransac } from 'ml-ransac';
 
-const result = myModule(args);
-// result is ...
+// defining the model function: a line
+export type LineFunction = (x: number) => number;
+
+export function line([a, b]: number[]): LineFunction {
+  return (x: number) => a * x + b;
+}
+
+// defining the fit function: we create a linear regression using levenberg-maquard
+export interface LinearRegressionOptions {
+  /**
+   * Initial parameter values.
+   *
+   * @default [0,0]
+   */
+  initialValues?: number[];
+}
+
+export function linearRegression(
+  source: number[],
+  destination: number[],
+  options: LinearRegressionOptions = {},
+): number[] {
+  const { initialValues = [0, 0] } = options;
+  const result = levenbergMarquardt({ x: source, y: destination }, line, {
+    initialValues,
+  });
+
+  return result.parameterValues;
+}
+
+// data
+const source = [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const destination = [-6, -2, 0, 5, 0, 0, -1, 1, 0, 0, -1, 0, 3];
+
+// finding the best model
+const result = ransac(source, destination, {
+  distanceFunction,
+  fitFunction,
+  modelFunction,
+  threshold: 1.1,
+  sampleSize: 2,
+  maxNbIterations: 10,
+  seed: 0,
+});
+
+// result is :
+//   {
+//     nbIterations: 10,
+//     modelParameters: [0, 0],
+//     inliers: [2, 4, 5, 6, 7, 8, 9, 10, 11],
+//     error: 1,
+//   }
 ```
 
 ## License
