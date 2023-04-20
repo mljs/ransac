@@ -2,6 +2,7 @@ import { toBeDeepCloseTo } from 'jest-matcher-deep-close-to';
 
 import { ransac } from '..';
 import { line, linearRegression } from '../utils/linearRegression';
+import { parabola, parabolaRegression } from '../utils/parabola';
 
 expect.extend({ toBeDeepCloseTo });
 
@@ -150,4 +151,20 @@ test('different length error', () => {
       maxNbIterations: 3,
     });
   }).toThrow('source and destination data should have the same length');
+});
+
+test('parabola', () => {
+  const source = [-4, -3, -2, -1, 0, 1, 2, 3, 6];
+  const destination = [2, 9, 4, 1, 0, 1, 4, 9, 4];
+
+  const result = ransac(source, destination, {
+    distanceFunction,
+    modelFunction: parabola,
+    fitFunction: parabolaRegression,
+    seed: 0,
+  });
+
+  expect(result.nbIterations).toBe(100);
+  expect(result.modelParameters).toBeDeepCloseTo([0.98, 0, 0.11], 1);
+  expect(result.inliers).toStrictEqual([1, 2, 3, 4, 5, 6, 7]);
 });
