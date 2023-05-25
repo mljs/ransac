@@ -1,30 +1,29 @@
+import { ModelFunction } from '..';
+
 import { Point } from './getMatrixFromPoints';
-import { RigidTransform } from './getRigidTransform';
 
 /**
- * Apply a rotation and a translation to a set of points.
+ * Generate a function that applies the given transformation parameters to a point.
  *
- * @param points - Points to process.
  * @param transform - Transformation to apply.
- * @returns Transformed points.
+ * @returns Transformed point.
  */
-export function applyRigidTransform(
-  points: Point[],
-  transform: RigidTransform,
-): Point[] {
-  let result: Point[] = [];
-  for (let point of points) {
+export function createRigidTransformModel(
+  transform: number[],
+): ModelFunction<Point> {
+  return (point: Point) => {
+    const angle = transform[0];
+    const xTranslation = transform[1];
+    const yTranslation = transform[2];
     const column =
-      Math.cos(transform.angle) * point.column -
-      Math.sin(transform.angle) * point.row +
-      transform.xTranslation;
+      Math.cos(angle) * point.column -
+      Math.sin(angle) * point.row +
+      xTranslation;
     const row =
-      Math.sin(transform.angle) * point.column +
-      Math.cos(transform.angle) * point.row +
-      transform.yTranslation;
+      Math.sin(angle) * point.column +
+      Math.cos(angle) * point.row +
+      yTranslation;
 
-    result.push({ row, column });
-  }
-
-  return result;
+    return { column, row };
+  };
 }

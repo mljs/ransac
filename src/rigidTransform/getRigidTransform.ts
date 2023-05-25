@@ -46,8 +46,6 @@ export function getRigidTransform(
   // should be 3x3
   const covarianceMatrix = srcMatrix.mmul(dstMatrix.transpose());
 
-  console.log({ covarianceMatrix });
-
   const svd = new SingularValueDecomposition(covarianceMatrix);
 
   const U = svd.leftSingularVectors;
@@ -83,4 +81,19 @@ export function getRigidTransform(
     yTranslation: translation.get(1, 0),
     angle: (Math.atan2(rotation.get(1, 0), rotation.get(0, 0)) * 180) / Math.PI,
   };
+}
+
+/**
+ * Get rigid transform model parameters.
+ *
+ * @param source - Source points.
+ * @param destination - Destination points.
+ * @returns The model parameters in the format [angle, xTranslation, yTranslation]
+ */
+export function getRigidTransformArray(
+  source: Point[],
+  destination: Point[],
+): number[] {
+  const result = getRigidTransform(source, destination);
+  return [result.angle, result.xTranslation, result.yTranslation];
 }

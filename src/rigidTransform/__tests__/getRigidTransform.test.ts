@@ -127,3 +127,22 @@ test('polygon rotated 180 degrees', () => {
     yTranslation: 2,
   });
 });
+
+test('test with a scale of 2', () => {
+  // todo: handle scale!
+  // angle seems to work if scale is not the same, so we should be able to compute the scale.
+  const source = [
+    { row: 2, column: 1 },
+    { row: -1, column: 1 },
+    { row: -1, column: -3 },
+  ];
+  const destination = [
+    { row: -2, column: 4 },
+    { row: -2, column: -2 },
+    { row: 6, column: -2 },
+  ];
+
+  const result = getRigidTransform(source, destination);
+
+  expect(result.angle).toBeCloseTo(-90);
+});
