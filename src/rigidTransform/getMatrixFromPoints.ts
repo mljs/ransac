@@ -24,7 +24,7 @@ export interface Point {
  * @returns The matrix.
  */
 export function getMatrixFromPoints(points: Point[]): Matrix {
-  let matrix = new Matrix(points.length, 3);
+  let matrix = new Matrix(3, points.length);
   for (let i = 1; i < points.length; i++) {
     matrix.set(0, i, points[i].column);
     matrix.set(1, i, points[i].row);
