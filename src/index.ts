@@ -3,19 +3,21 @@ import Random from 'ml-random';
 
 import { getNbIterations } from './utils/getNbIterations';
 
-type DistFunction<DataType> = (
+export type DistFunction<DataType> = (
   value: DataType,
   predictedValue: DataType,
 ) => number;
 
-type FitFunction<DataType> = (
+export type FitFunction<DataType> = (
   source: DataType[],
   destination: DataType[],
 ) => number[];
 
-type ModelFunction<DataType> = (source: DataType) => DataType;
+export type ModelFunction<DataType> = (source: DataType) => DataType;
 
-type ModelCreator<DataType> = (parameters: number[]) => ModelFunction<DataType>;
+export type ModelCreator<DataType> = (
+  parameters: number[],
+) => ModelFunction<DataType>;
 
 export interface RansacBaseOptions<DataType> {
   /**
