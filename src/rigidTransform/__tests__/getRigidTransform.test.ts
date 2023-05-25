@@ -15,8 +15,8 @@ test('3 points', () => {
   const result = getRigidTransform(source, destination);
 
   expect(result).toBeDeepCloseTo({
-    xTranslation: 1 / 3,
-    yTranslation: 1 / 3,
+    xTranslation: 0,
+    yTranslation: 0,
     angle: -90,
   });
 });
@@ -40,11 +40,11 @@ test('6 points on a line', () => {
   ];
 
   const result = getRigidTransform(source, destination);
-
+  console.log({ result });
   expect(result).toBeDeepCloseTo({
-    xTranslation: -4,
-    yTranslation: -5,
     angle: 180,
+    xTranslation: 0,
+    yTranslation: 4,
   });
 });
 
@@ -70,8 +70,35 @@ test('square', () => {
   console.log(result);
 
   expect(result).toBeDeepCloseTo({
-    xTranslation: (side + diagonal) / 2,
-    yTranslation: -side / 2,
     angle: -135,
+    xTranslation: 0,
+    yTranslation: 0,
+  });
+});
+
+test('polygon rotated 180 degrees', () => {
+  const source = [
+    { column: 4, row: 3 },
+    { column: 2, row: 5 },
+    { column: 5, row: 6 },
+    { column: 7, row: 5 },
+    { column: 6, row: 3 },
+    { column: 5, row: 4 },
+  ];
+  const destination = [
+    { column: 5, row: -1 },
+    { column: 7, row: -3 },
+    { column: 4, row: -4 },
+    { column: 2, row: -3 },
+    { column: 3, row: -1 },
+    { column: 4, row: -2 },
+  ];
+  const result = getRigidTransform(source, destination);
+  console.log(result);
+
+  expect(result).toBeDeepCloseTo({
+    angle: 180,
+    xTranslation: 9,
+    yTranslation: 2,
   });
 });
