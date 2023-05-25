@@ -1,5 +1,5 @@
 import { Point, getCentroid } from './getCentroid';
-// destination - source
+
 /**
  * Compute the translation vector to add to source to get to destination.
  *
