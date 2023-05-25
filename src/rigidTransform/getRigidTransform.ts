@@ -55,15 +55,12 @@ export function getRigidTransform(
 
   let rotation = V.mmul(U.transpose());
 
-  console.log({ rotation });
-
-  if (determinant(rotation) < 0) {
+  if (determinant(rotation) === -1) {
     const newSvd = new SingularValueDecomposition(rotation);
     const newU = newSvd.leftSingularVectors;
     const newV = newSvd.rightSingularVectors.mulColumn(2, -1);
 
     rotation = newV.mmul(newU.transpose());
-    console.log({ newRotation: rotation });
   }
 
   const srcCentroidVector = new Matrix([
@@ -77,12 +74,9 @@ export function getRigidTransform(
     [0],
   ]);
 
-  console.log({ srcCentroidVector, dstCentroidVector, rotation });
-
   const translation = dstCentroidVector.subtract(
     rotation.mmul(srcCentroidVector),
   );
-  console.log(translation);
 
   return {
     xTranslation: translation.get(0, 0),

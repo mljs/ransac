@@ -40,7 +40,7 @@ test('6 points on a line', () => {
   ];
 
   const result = getRigidTransform(source, destination);
-  console.log({ result });
+
   expect(result).toBeDeepCloseTo({
     angle: 180,
     xTranslation: 0,
@@ -52,25 +52,51 @@ test('square', () => {
   const side = 3;
 
   const source = [
-    { row: 0, column: 0 },
-    { row: side, column: 0 },
-    { row: side, column: -side },
-    { row: 0, column: -side },
+    { column: 0, row: 0 },
+    { column: 0, row: side },
+    { column: -side, row: side },
+    { column: -side, row: 0 },
   ];
   const diagonal = side * Math.sqrt(2);
 
   const destination = [
-    { row: 0, column: 0 },
-    { row: -diagonal / 2, column: diagonal / 2 },
-    { row: 0, column: diagonal },
-    { row: diagonal / 2, column: diagonal / 2 },
+    { column: 0, row: 0 },
+    { column: diagonal / 2, row: -diagonal / 2 },
+    { column: diagonal, row: 0 },
+    { column: diagonal / 2, row: diagonal / 2 },
   ];
 
   const result = getRigidTransform(source, destination);
-  console.log(result);
 
   expect(result).toBeDeepCloseTo({
     angle: -135,
+    xTranslation: 0,
+    yTranslation: 0,
+  });
+});
+
+test('angle should be 45 degrees', () => {
+  const side = 3;
+
+  const source = [
+    { column: 0, row: 0 },
+    { column: side, row: 0 },
+    { column: side, row: side },
+    { column: 0, row: side },
+  ];
+  const diagonal = side * Math.sqrt(2);
+
+  const destination = [
+    { column: 0, row: 0 },
+    { column: diagonal / 2, row: diagonal / 2 },
+    { column: 0, row: diagonal },
+    { column: -diagonal / 2, row: diagonal / 2 },
+  ];
+
+  const result = getRigidTransform(source, destination);
+
+  expect(result).toBeDeepCloseTo({
+    angle: 45,
     xTranslation: 0,
     yTranslation: 0,
   });
@@ -94,7 +120,6 @@ test('polygon rotated 180 degrees', () => {
     { column: 4, row: -2 },
   ];
   const result = getRigidTransform(source, destination);
-  console.log(result);
 
   expect(result).toBeDeepCloseTo({
     angle: 180,

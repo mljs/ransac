@@ -1,4 +1,5 @@
-import { Point, getCentroid } from './getCentroid';
+import { getCentroid } from './getCentroid';
+import { Point } from './getMatrixFromPoints';
 
 /**
  * Compute the translation vector to add to source to get to destination.
