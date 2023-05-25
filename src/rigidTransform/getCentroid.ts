@@ -1,18 +1,4 @@
-/**
- * Coordinates of a point in an image with the top-left corner being the reference point.
- */
-export interface Point {
-  /**
-   * Point row.
-   *
-   */
-  row: number;
-  /**
-   * Point column.
-   *
-   */
-  column: number;
-}
+import { Point } from './getMatrixFromPoints';
 
 /**
  * Compute the centroid of a set of points.
