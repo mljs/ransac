@@ -8,7 +8,7 @@ import Matrix from 'ml-matrix';
  */
 export function getCentroid(points: Matrix): Matrix {
   let result = new Matrix(3, 1);
-  const nbPoints = points.getRow(0).length;
+  const nbPoints = points.columns;
   let xSum = 0;
   let ySum = 0;
 
