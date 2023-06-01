@@ -1,4 +1,5 @@
-import { getRigidTransform } from '../getRigidTransform';
+import { getMatrixFromPoints } from '../../forImageJs/getMatrixFromPoints';
+import { getAffineTransform } from '../getAffineTransform';
 
 test('3 points', () => {
   const source = [
@@ -12,16 +13,18 @@ test('3 points', () => {
     { row: 3, column: -1 },
   ];
 
-  const result = getRigidTransform(source, destination);
+  const sourceMatrix = getMatrixFromPoints(source);
+  const destinationMatrix = getMatrixFromPoints(destination);
+
+  const result = getAffineTransform(sourceMatrix, destinationMatrix);
 
   expect(result).toBeDeepCloseTo({
-    xTranslation: 0,
-    yTranslation: 0,
-    angle: -90,
+    translation: { x: 0, y: 0 },
+    rotation: -90,
   });
 });
 
-test.only('6 points on a line', () => {
+test('6 points on a line', () => {
   const source = [
     { row: 2, column: 2 },
     { row: 3, column: 2 },
@@ -39,12 +42,14 @@ test.only('6 points on a line', () => {
     { row: -3, column: -2 },
   ];
 
-  const result = getRigidTransform(source, destination);
+  const sourceMatrix = getMatrixFromPoints(source);
+  const destinationMatrix = getMatrixFromPoints(destination);
+
+  const result = getAffineTransform(sourceMatrix, destinationMatrix);
 
   expect(result).toBeDeepCloseTo({
-    angle: 180,
-    xTranslation: 0,
-    yTranslation: 4,
+    rotation: 180,
+    translation: { x: 0, y: 4 },
   });
 });
 
@@ -66,12 +71,14 @@ test('square', () => {
     { column: diagonal / 2, row: diagonal / 2 },
   ];
 
-  const result = getRigidTransform(source, destination);
+  const sourceMatrix = getMatrixFromPoints(source);
+  const destinationMatrix = getMatrixFromPoints(destination);
+
+  const result = getAffineTransform(sourceMatrix, destinationMatrix);
 
   expect(result).toBeDeepCloseTo({
-    angle: -135,
-    xTranslation: 0,
-    yTranslation: 0,
+    rotation: -135,
+    translation: { x: 0, y: 0 },
   });
 });
 
@@ -93,12 +100,14 @@ test('angle should be 45 degrees', () => {
     { column: -diagonal / 2, row: diagonal / 2 },
   ];
 
-  const result = getRigidTransform(source, destination);
+  const sourceMatrix = getMatrixFromPoints(source);
+  const destinationMatrix = getMatrixFromPoints(destination);
+
+  const result = getAffineTransform(sourceMatrix, destinationMatrix);
 
   expect(result).toBeDeepCloseTo({
-    angle: 45,
-    xTranslation: 0,
-    yTranslation: 0,
+    rotation: 45,
+    translation: { x: 0, y: 0 },
   });
 });
 
@@ -119,12 +128,14 @@ test('polygon rotated 180 degrees', () => {
     { column: 3, row: -1 },
     { column: 4, row: -2 },
   ];
-  const result = getRigidTransform(source, destination);
+  const sourceMatrix = getMatrixFromPoints(source);
+  const destinationMatrix = getMatrixFromPoints(destination);
+
+  const result = getAffineTransform(sourceMatrix, destinationMatrix);
 
   expect(result).toBeDeepCloseTo({
-    angle: 180,
-    xTranslation: 9,
-    yTranslation: 2,
+    rotation: 180,
+    translation: { x: 9, y: 2 },
   });
 });
 
@@ -142,7 +153,10 @@ test('test with a scale of 2', () => {
     { row: 6, column: -2 },
   ];
 
-  const result = getRigidTransform(source, destination);
+  const sourceMatrix = getMatrixFromPoints(source);
+  const destinationMatrix = getMatrixFromPoints(destination);
 
-  expect(result.angle).toBeCloseTo(-90);
+  const result = getAffineTransform(sourceMatrix, destinationMatrix);
+
+  expect(result.rotation).toBeCloseTo(-90);
 });
