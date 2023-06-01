@@ -1,5 +1,5 @@
-import { createRigidTransformModel } from '../../../rigidTransform/createRigidTransformModel';
-import { applyRigidTransfom } from '../applyAffineTransform';
+import { applyAffineTransfom } from '../applyAffineTransform';
+import { createAffineTransformModel } from '../createAffineTransformModel';
 
 test('6 points aligned', () => {
   const source = [
@@ -19,8 +19,8 @@ test('6 points aligned', () => {
     { row: -3, column: -2 },
   ];
 
-  const model = createRigidTransformModel([180, 0, 4]);
-  const result = applyRigidTransfom(source, model);
+  const model = createAffineTransformModel([180, 0, 4]);
+  const result = applyAffineTransfom(source, model);
 
   expect(result).toBeDeepCloseTo(expected);
 });
