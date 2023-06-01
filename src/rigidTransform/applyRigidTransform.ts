@@ -3,27 +3,21 @@ import { ModelFunction } from '..';
 import { Point } from './getMatrixFromPoints';
 
 /**
- * Generate a function that applies the given transformation parameters to a point.
+ * Apply a given transform to a set of points.
  *
- * @param transform - Transformation to apply.
- * @returns Transformed point.
+ * @param points - Points to process.
+ * @param model - The transformation function.
+ * @returns The transformed points.
  */
-export function createRigidTransformModel(
-  transform: number[],
-): ModelFunction<Point> {
-  return (point: Point) => {
-    const angle = transform[0];
-    const xTranslation = transform[1];
-    const yTranslation = transform[2];
-    const column =
-      Math.cos(angle) * point.column -
-      Math.sin(angle) * point.row +
-      xTranslation;
-    const row =
-      Math.sin(angle) * point.column +
-      Math.cos(angle) * point.row +
-      yTranslation;
+export function applyRigidTransfom(
+  points: Point[],
+  model: ModelFunction<Point>,
+): Point[] {
+  let result: Point[] = [];
 
-    return { column, row };
-  };
+  for (let point of points) {
+    result.push(model(point));
+  }
+
+  return result;
 }
