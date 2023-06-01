@@ -1,4 +1,4 @@
-import { Point } from './getMatrixFromPoints';
+import { Point } from '../toMigrate/forImageJs/getMatrixFromPoints';
 
 /**
  * Subtract the vector from the points.

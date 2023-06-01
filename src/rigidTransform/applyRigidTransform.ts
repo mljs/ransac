@@ -1,6 +1,6 @@
 import { ModelFunction } from '..';
 
-import { Point } from './getMatrixFromPoints';
+import { Point } from '../toMigrate/forImageJs/getMatrixFromPoints';
 
 /**
  * Apply a given transform to a set of points.
