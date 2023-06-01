@@ -1,5 +1,8 @@
+import Matrix from 'ml-matrix';
+
 import { applyAffineTransfom } from '../applyAffineTransform';
 import { createAffineTransformModel } from '../createAffineTransformModel';
+import { getPointsFromMatrix } from '../getPointsFromMatrix';
 
 test('6 points aligned', () => {
   const source = [
@@ -19,7 +22,27 @@ test('6 points aligned', () => {
     { row: -3, column: -2 },
   ];
 
-  const model = createAffineTransformModel([180, 0, 4]);
+  const model = createAffineTransformModel([180, 0, 4, 1]);
+  const result = applyAffineTransfom(source, model);
+
+  expect(result).toBeDeepCloseTo(expected);
+});
+
+test('rectangle with scale = 2', () => {
+  const sourceMatrix = new Matrix([
+    [1, 5, 5, 1],
+    [-4, -4, -2, -2],
+    [1, 1, 1, 1],
+  ]);
+  const expectedMatrix = new Matrix([
+    [-6, -6, -2, -2],
+    [10, 2, 2, 10],
+    [1, 1, 1, 1],
+  ]);
+  const source = getPointsFromMatrix(sourceMatrix);
+  const expected = getPointsFromMatrix(expectedMatrix);
+
+  const model = createAffineTransformModel([-90, 2, 11, 2]);
   const result = applyAffineTransfom(source, model);
 
   expect(result).toBeDeepCloseTo(expected);

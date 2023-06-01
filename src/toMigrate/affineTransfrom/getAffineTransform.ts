@@ -1,7 +1,5 @@
 import Matrix, { SingularValueDecomposition, determinant } from 'ml-matrix';
 
-import { Point, getMatrixFromPoints } from '../forImageJs/getMatrixFromPoints';
-
 import { getCentroid } from './getCentroid';
 
 export interface AffineTransform {
@@ -13,6 +11,7 @@ export interface AffineTransform {
    * Clockwise angle in degrees.
    */
   rotation: number;
+  scale: number;
 }
 
 /**
@@ -30,16 +29,27 @@ export function getAffineTransform(
   const sourceCentroid = getCentroid(source);
   const destinationCentroid = getCentroid(destination);
 
-  const translatedSource = source.subColumnVector(sourceCentroid);
-  const translatedDestination =
-    destination.subColumnVector(destinationCentroid);
+  const translatedSource = source.clone().subColumnVector(sourceCentroid);
+  const translatedDestination = destination
+    .clone()
+    .subColumnVector(destinationCentroid);
 
-  // console.log({ translatedSource, translatedDestination });
+  // computing scale
+  let ratioSum = 0;
+  const nbPoints = source.columns;
+  for (let i = 0; i < nbPoints; i++) {
+    const sourcePoint = translatedSource.getColumn(i);
+    const destinationPoint = translatedDestination.getColumn(i);
+    ratioSum +=
+      getDistanceToOrigin(destinationPoint) / getDistanceToOrigin(sourcePoint);
+  }
+  const scale = ratioSum / nbPoints;
+  console.log({ scale });
 
-  // should be 3x3
-  const covarianceMatrix = translatedSource.mmul(
-    translatedDestination.transpose(),
-  );
+  const scaledSource = Matrix.mul(translatedSource, scale);
+
+  // computing rotation
+  const covarianceMatrix = scaledSource.mmul(translatedDestination.transpose());
 
   const svd = new SingularValueDecomposition(covarianceMatrix);
 
@@ -48,17 +58,14 @@ export function getAffineTransform(
 
   let rotation = V.mmul(U.transpose());
 
-  if (determinant(rotation) === -1) {
-    const newSvd = new SingularValueDecomposition(rotation);
-    const newU = newSvd.leftSingularVectors;
-    const newV = newSvd.rightSingularVectors.mulColumn(2, -1);
+  // if (determinant(rotation) === -1) {
+  //   console.log('special');
+  //   const newSvd = new SingularValueDecomposition(rotation);
+  //   const newU = newSvd.leftSingularVectors;
+  //   const newV = newSvd.rightSingularVectors.mulColumn(2, -1);
 
-    rotation = newV.mmul(newU.transpose());
-  }
-
-  const translation = destinationCentroid.subtract(
-    rotation.mmul(sourceCentroid),
-  );
+  //   rotation = newV.mmul(newU.transpose());
+  // }
 
   let angleDegrees =
     (Math.atan2(rotation.get(1, 0), rotation.get(0, 0)) * 180) / Math.PI;
@@ -67,28 +74,22 @@ export function getAffineTransform(
     angleDegrees = 180;
   }
 
+  // computing translation
+  const translation = Matrix.sub(
+    destinationCentroid,
+    rotation.mmul(sourceCentroid),
+  );
+
   return {
     translation: {
       x: translation.get(0, 0),
       y: translation.get(1, 0),
     },
     rotation: angleDegrees,
+    scale,
   };
 }
 
-/**
- * Get rigid transform model parameters.
- *
- * @param source - Source points.
- * @param destination - Destination points.
- * @returns The model parameters in the format [angle, xTranslation, yTranslation]
- */
-export function getRigidTransformArray(
-  source: Point[],
-  destination: Point[],
-): number[] {
-  const sourceMatrix = getMatrixFromPoints(source);
-  const destinationMatrix = getMatrixFromPoints(destination);
-  const result = getAffineTransform(sourceMatrix, destinationMatrix);
-  return [result.rotation, result.translation.x, result.translation.y];
+function getDistanceToOrigin(point: number[]): number {
+  return Math.sqrt(point[0] ** 2 + point[1] ** 2);
 }

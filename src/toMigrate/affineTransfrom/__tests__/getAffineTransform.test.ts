@@ -1,3 +1,6 @@
+import Matrix from 'ml-matrix';
+
+import { drawResult } from '../../forImageJs/drawResult';
 import { getMatrixFromPoints } from '../../forImageJs/getMatrixFromPoints';
 import { getAffineTransform } from '../getAffineTransform';
 
@@ -21,6 +24,7 @@ test('3 points', () => {
   expect(result).toBeDeepCloseTo({
     translation: { x: 0, y: 0 },
     rotation: -90,
+    scale: 1,
   });
 });
 
@@ -50,6 +54,7 @@ test('6 points on a line', () => {
   expect(result).toBeDeepCloseTo({
     rotation: 180,
     translation: { x: 0, y: 4 },
+    scale: 1,
   });
 });
 
@@ -79,6 +84,7 @@ test('square', () => {
   expect(result).toBeDeepCloseTo({
     rotation: -135,
     translation: { x: 0, y: 0 },
+    scale: 1,
   });
 });
 
@@ -108,6 +114,7 @@ test('angle should be 45 degrees', () => {
   expect(result).toBeDeepCloseTo({
     rotation: 45,
     translation: { x: 0, y: 0 },
+    scale: 1,
   });
 });
 
@@ -136,27 +143,92 @@ test('polygon rotated 180 degrees', () => {
   expect(result).toBeDeepCloseTo({
     rotation: 180,
     translation: { x: 9, y: 2 },
+    scale: 1,
   });
 });
 
-test('test with a scale of 2', () => {
-  // todo: handle scale!
-  // angle seems to work if scale is not the same, so we should be able to compute the scale.
-  const source = [
-    { row: 2, column: 1 },
-    { row: -1, column: 1 },
-    { row: -1, column: -3 },
-  ];
-  const destination = [
-    { row: -2, column: 4 },
-    { row: -2, column: -2 },
-    { row: 6, column: -2 },
-  ];
+test('rectangle only rotated', () => {
+  const source = new Matrix([
+    [1, 5, 5, 1],
+    [-4, -4, -2, -2],
+    [1, 1, 1, 1],
+  ]);
+  const destination = new Matrix([
+    [-4, -4, -2, -2],
+    [-1, -5, -5, -1],
+    [1, 1, 1, 1],
+  ]);
+  const result = getAffineTransform(source, destination);
+  console.log(result);
+  expect(result).toBeDeepCloseTo({
+    translation: { x: 0, y: 0 },
+    scale: 1,
+    rotation: -90,
+  });
+});
 
-  const sourceMatrix = getMatrixFromPoints(source);
-  const destinationMatrix = getMatrixFromPoints(destination);
+test('rectangle with translation', () => {
+  const source = new Matrix([
+    [1, 5, 5, 1],
+    [-4, -4, -2, -2],
+    [1, 1, 1, 1],
+  ]);
+  const destination = new Matrix([
+    [-5, -5, -3, -3],
+    [8, 4, 4, 8],
+    [1, 1, 1, 1],
+  ]);
+  const result = getAffineTransform(source, destination);
+  console.log(result);
+  expect(result).toBeDeepCloseTo({
+    translation: { x: 2, y: 11 },
+    scale: 1,
+    rotation: -90,
+  });
+});
 
-  const result = getAffineTransform(sourceMatrix, destinationMatrix);
+describe('scale different from 1', () => {
+  it('triangle with a scale of 2', () => {
+    const source = [
+      { row: 2, column: 1 },
+      { row: -1, column: 1 },
+      { row: -1, column: -3 },
+    ];
+    const destination = [
+      { row: -2, column: 4 },
+      { row: -2, column: -2 },
+      { row: 6, column: -2 },
+    ];
 
-  expect(result.rotation).toBeCloseTo(-90);
+    const sourceMatrix = getMatrixFromPoints(source);
+    const destinationMatrix = getMatrixFromPoints(destination);
+
+    const result = getAffineTransform(sourceMatrix, destinationMatrix);
+
+    expect(result).toBeDeepCloseTo({
+      translation: { x: 0, y: 1 / 3 },
+      scale: 2,
+      rotation: -90,
+    });
+  });
+
+  it('rectangle with a scale of 2', () => {
+    const source = new Matrix([
+      [1, 5, 5, 1],
+      [-4, -4, -2, -2],
+      [1, 1, 1, 1],
+    ]);
+    const destination = new Matrix([
+      [-6, -6, -2, -2],
+      [10, 2, 2, 10],
+      [1, 1, 1, 1],
+    ]);
+    const result = getAffineTransform(source, destination);
+    console.log(result);
+    expect(result).toBeDeepCloseTo({
+      translation: { x: 2, y: 11 },
+      scale: 2,
+      rotation: -90,
+    });
+  });
 });
