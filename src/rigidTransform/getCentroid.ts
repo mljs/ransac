@@ -1,4 +1,4 @@
-import { Point } from './getMatrixFromPoints';
+import { Point } from '../toMigrate/forImageJs/getMatrixFromPoints';
 
 /**
  * Compute the centroid of a set of points.

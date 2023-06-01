@@ -1,4 +1,4 @@
-import { Point } from './getMatrixFromPoints';
+import { Point } from '../toMigrate/forImageJs/getMatrixFromPoints';
 
 /**
  * Compute the distance between point 1 and point 2.

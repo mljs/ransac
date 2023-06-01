@@ -1,5 +1,5 @@
 import { getCentroid } from './getCentroid';
-import { Point } from './getMatrixFromPoints';
+import { Point } from '../toMigrate/forImageJs/getMatrixFromPoints';
 
 /**
  * Compute the translation vector to add to source to get to destination.
