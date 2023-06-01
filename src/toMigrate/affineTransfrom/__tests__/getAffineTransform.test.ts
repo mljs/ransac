@@ -1,6 +1,5 @@
 import Matrix from 'ml-matrix';
 
-import { drawResult } from '../../forImageJs/drawResult';
 import { getMatrixFromPoints } from '../../forImageJs/getMatrixFromPoints';
 import { getAffineTransform } from '../getAffineTransform';
 
@@ -159,7 +158,7 @@ test('rectangle only rotated', () => {
     [1, 1, 1, 1],
   ]);
   const result = getAffineTransform(source, destination);
-  console.log(result);
+
   expect(result).toBeDeepCloseTo({
     translation: { x: 0, y: 0 },
     scale: 1,
@@ -179,9 +178,8 @@ test('rectangle with translation', () => {
     [1, 1, 1, 1],
   ]);
   const result = getAffineTransform(source, destination);
-  console.log(result);
   expect(result).toBeDeepCloseTo({
-    translation: { x: 2, y: 11 },
+    translation: { x: -1, y: 9 },
     scale: 1,
     rotation: -90,
   });
@@ -206,7 +204,7 @@ describe('scale different from 1', () => {
     const result = getAffineTransform(sourceMatrix, destinationMatrix);
 
     expect(result).toBeDeepCloseTo({
-      translation: { x: 0, y: 1 / 3 },
+      translation: { x: 0, y: 0 },
       scale: 2,
       rotation: -90,
     });
@@ -224,9 +222,9 @@ describe('scale different from 1', () => {
       [1, 1, 1, 1],
     ]);
     const result = getAffineTransform(source, destination);
-    console.log(result);
+
     expect(result).toBeDeepCloseTo({
-      translation: { x: 2, y: 11 },
+      translation: { x: 2, y: 12 },
       scale: 2,
       rotation: -90,
     });

@@ -1,4 +1,4 @@
-import Matrix, { SingularValueDecomposition, determinant } from 'ml-matrix';
+import Matrix, { SingularValueDecomposition } from 'ml-matrix';
 
 import { getCentroid } from './getCentroid';
 
@@ -44,7 +44,6 @@ export function getAffineTransform(
       getDistanceToOrigin(destinationPoint) / getDistanceToOrigin(sourcePoint);
   }
   const scale = ratioSum / nbPoints;
-  console.log({ scale });
 
   const scaledSource = Matrix.mul(translatedSource, scale);
 
@@ -77,7 +76,7 @@ export function getAffineTransform(
   // computing translation
   const translation = Matrix.sub(
     destinationCentroid,
-    rotation.mmul(sourceCentroid),
+    Matrix.mul(rotation.mmul(sourceCentroid), scale),
   );
 
   return {
