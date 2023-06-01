@@ -1,53 +1,45 @@
 import Matrix, { SingularValueDecomposition, determinant } from 'ml-matrix';
 
-import { getCentroid } from './getCentroid';
-import {
-  Point,
-  getMatrixFromPoints,
-} from '../toMigrate/forImageJs/getMatrixFromPoints';
-import { subtractVector } from './translatePoints';
+import { Point, getMatrixFromPoints } from '../forImageJs/getMatrixFromPoints';
 
-export interface RigidTransform {
+import { getCentroid } from './getCentroid';
+
+export interface AffineTransform {
   /**
-   * Translation of source points along x axis.
+   * Translation of source points along x and y axes.
    */
-  xTranslation: number;
-  /**
-   * Translation of source points along y axis.
-   */
-  yTranslation: number;
+  translation: { x: number; y: number };
   /**
    * Clockwise angle in degrees.
    */
-  angle: number;
+  rotation: number;
 }
 
 /**
  * Get best rotation and translation of source points to destination points.
  * Based on {@link https://nghiaho.com/?page_id=671}
  *
- * @param source - Source points.
- * @param destination - Destination points.
- * @returns The rigid transformation.
+ * @param source - Source points as a 3xN matrix. Third dimension must be padded with zeros.
+ * @param destination - Destination points as a 3xN matrix. Third dimension must be padded with zeros.
+ * @returns The affine transformation.
  */
-export function getRigidTransform(
-  source: Point[],
-  destination: Point[],
-): RigidTransform {
+export function getAffineTransform(
+  source: Matrix,
+  destination: Matrix,
+): AffineTransform {
   const sourceCentroid = getCentroid(source);
   const destinationCentroid = getCentroid(destination);
 
-  const translatedSource = subtractVector(source, sourceCentroid);
-  const translatedDestination = subtractVector(
-    destination,
-    destinationCentroid,
-  );
+  const translatedSource = source.subColumnVector(sourceCentroid);
+  const translatedDestination =
+    destination.subColumnVector(destinationCentroid);
 
-  const srcMatrix = getMatrixFromPoints(translatedSource);
-  const dstMatrix = getMatrixFromPoints(translatedDestination);
+  // console.log({ translatedSource, translatedDestination });
 
   // should be 3x3
-  const covarianceMatrix = srcMatrix.mmul(dstMatrix.transpose());
+  const covarianceMatrix = translatedSource.mmul(
+    translatedDestination.transpose(),
+  );
 
   const svd = new SingularValueDecomposition(covarianceMatrix);
 
@@ -64,19 +56,8 @@ export function getRigidTransform(
     rotation = newV.mmul(newU.transpose());
   }
 
-  const srcCentroidVector = new Matrix([
-    [sourceCentroid.column],
-    [sourceCentroid.row],
-    [0],
-  ]);
-  const dstCentroidVector = new Matrix([
-    [destinationCentroid.column],
-    [destinationCentroid.row],
-    [0],
-  ]);
-
-  const translation = dstCentroidVector.subtract(
-    rotation.mmul(srcCentroidVector),
+  const translation = destinationCentroid.subtract(
+    rotation.mmul(sourceCentroid),
   );
 
   let angleDegrees =
@@ -87,9 +68,11 @@ export function getRigidTransform(
   }
 
   return {
-    xTranslation: translation.get(0, 0),
-    yTranslation: translation.get(1, 0),
-    angle: angleDegrees,
+    translation: {
+      x: translation.get(0, 0),
+      y: translation.get(1, 0),
+    },
+    rotation: angleDegrees,
   };
 }
 
@@ -104,6 +87,8 @@ export function getRigidTransformArray(
   source: Point[],
   destination: Point[],
 ): number[] {
-  const result = getRigidTransform(source, destination);
-  return [result.angle, result.xTranslation, result.yTranslation];
+  const sourceMatrix = getMatrixFromPoints(source);
+  const destinationMatrix = getMatrixFromPoints(destination);
+  const result = getAffineTransform(sourceMatrix, destinationMatrix);
+  return [result.rotation, result.translation.x, result.translation.y];
 }

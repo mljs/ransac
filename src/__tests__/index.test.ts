@@ -4,9 +4,9 @@ import { toBeDeepCloseTo } from 'jest-matcher-deep-close-to';
 import { ransac } from '..';
 import { applyRigidTransfom } from '../rigidTransform/applyRigidTransform';
 import { createRigidTransformModel } from '../rigidTransform/createRigidTransformModel';
-import { drawResult } from '../toMigrate/forImageJs/drawResult';
 import { getEuclidianDistance } from '../rigidTransform/getEuclidianDistance';
 import { getRigidTransformArray } from '../rigidTransform/getRigidTransform';
+import { drawResult } from '../toMigrate/forImageJs/drawResult';
 import { line, linearRegression } from '../utils/linearRegression';
 import { parabola, parabolaRegression } from '../utils/parabola';
 

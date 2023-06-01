@@ -1,10 +1,11 @@
 import Matrix, { SingularValueDecomposition, determinant } from 'ml-matrix';
 
-import { getCentroid } from './getCentroid';
 import {
   Point,
   getMatrixFromPoints,
 } from '../toMigrate/forImageJs/getMatrixFromPoints';
+
+import { getCentroid } from './getCentroid';
 import { subtractVector } from './translatePoints';
 
 export interface RigidTransform {
@@ -45,6 +46,8 @@ export function getRigidTransform(
 
   const srcMatrix = getMatrixFromPoints(translatedSource);
   const dstMatrix = getMatrixFromPoints(translatedDestination);
+
+  // console.log({ srcMatrix, dstMatrix });
 
   // should be 3x3
   const covarianceMatrix = srcMatrix.mmul(dstMatrix.transpose());

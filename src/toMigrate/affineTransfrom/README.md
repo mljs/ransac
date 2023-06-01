@@ -1,6 +1,11 @@
 # Finding rotation and translation between two sets of points
 
-Based on the tutorial: https://nghiaho.com/?page_id=671
+Based on the tutorial: https://nghiaho.com/?page_id=67
+
+## Main steps of the algorithm
+
+1. Find centroids of the two point sets and deduce the translation from one to the other
+2. Find rotation using SVD
 
 ## API
 
@@ -17,8 +22,3 @@ export function getAffineTransform(
   destination: Matrix,
 ): AffineTransformParameters;
 ```
-
-## Main steps of the algorithm
-
-1. Find centroids of the two point sets and deduce the translation from one to the other
-2. Find rotation using SVD
