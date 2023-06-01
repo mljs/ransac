@@ -76,10 +76,17 @@ export function getRigidTransform(
     rotation.mmul(srcCentroidVector),
   );
 
+  let angleDegrees =
+    (Math.atan2(rotation.get(1, 0), rotation.get(0, 0)) * 180) / Math.PI;
+
+  if (angleDegrees === -180) {
+    angleDegrees = 180;
+  }
+
   return {
     xTranslation: translation.get(0, 0),
     yTranslation: translation.get(1, 0),
-    angle: (Math.atan2(rotation.get(1, 0), rotation.get(0, 0)) * 180) / Math.PI,
+    angle: angleDegrees,
   };
 }
 

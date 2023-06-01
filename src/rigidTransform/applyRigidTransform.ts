@@ -16,7 +16,12 @@ export function applyRigidTransfom(
   let result: Point[] = [];
 
   for (let point of points) {
-    result.push(model(point));
+    const transformed = model(point);
+    const roundedPoint = {
+      row: Math.round(transformed.row),
+      column: Math.round(transformed.column),
+    };
+    result.push(roundedPoint);
   }
 
   return result;
