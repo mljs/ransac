@@ -1,7 +1,7 @@
 import { toBeDeepCloseTo } from 'jest-matcher-deep-close-to';
 
 import { ransac } from '..';
-import { createRigidTransformModel } from '../rigidTransform/applyRigidTransform';
+import { createRigidTransformModel } from '../rigidTransform/createRigidTransformModel';
 import { getEuclidianDistance } from '../rigidTransform/getEuclidianDistance';
 import { getRigidTransformArray } from '../rigidTransform/getRigidTransform';
 import { line, linearRegression } from '../utils/linearRegression';
@@ -174,7 +174,7 @@ test('parabola', () => {
 });
 
 describe('2D data (points)', () => {
-  it('ten points perfectly aligned', () => {
+  it('6 points perfectly aligned', () => {
     const source = [
       { row: 2, column: 2 },
       { row: 3, column: 2 },
@@ -200,7 +200,7 @@ describe('2D data (points)', () => {
 
     expect(result.modelParameters).toStrictEqual([180, 0, 4]);
   });
-  it('ten points with outliers', () => {
+  it('6 points with outliers', () => {
     const source = [
       { row: 2, column: 2 },
       { row: 3, column: 2 },
@@ -222,7 +222,6 @@ describe('2D data (points)', () => {
       distanceFunction: getEuclidianDistance,
       modelFunction: createRigidTransformModel,
       fitFunction: getRigidTransformArray,
-      maxNbIterations: 1000,
     });
 
     expect(result.modelParameters).toStrictEqual([180, 0, 4]);

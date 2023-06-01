@@ -11,8 +11,6 @@ test('4 points forming square', () => {
 
   const result = getMatrixFromPoints(points);
 
-  console.log(result);
-
   expect(result.to2DArray()).toStrictEqual([
     [0, 0, -3, -3],
     [0, 3, 3, 0],
