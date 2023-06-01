@@ -2,7 +2,7 @@ import { writeSync } from 'image-js';
 import { toBeDeepCloseTo } from 'jest-matcher-deep-close-to';
 
 import { ransac } from '..';
-import { applyRigidTransfom } from '../rigidTransform/applyRigidTransform';
+import { applyRigidTransfom } from '../toMigrate/forImageJs/applyAffineTransform';
 import { createRigidTransformModel } from '../rigidTransform/createRigidTransformModel';
 import { getEuclidianDistance } from '../rigidTransform/getEuclidianDistance';
 import { getRigidTransformArray } from '../rigidTransform/getRigidTransform';

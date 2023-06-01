@@ -1,5 +1,5 @@
-import { applyRigidTransfom } from '../applyRigidTransform';
-import { createRigidTransformModel } from '../createRigidTransformModel';
+import { createRigidTransformModel } from '../../../rigidTransform/createRigidTransformModel';
+import { applyRigidTransfom } from '../applyAffineTransform';
 
 test('6 points aligned', () => {
   const source = [
