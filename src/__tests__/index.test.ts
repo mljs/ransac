@@ -2,11 +2,11 @@ import { writeSync } from 'image-js';
 import { toBeDeepCloseTo } from 'jest-matcher-deep-close-to';
 
 import { ransac } from '..';
-import { applyRigidTransfom } from '../toMigrate/forImageJs/applyAffineTransform';
-import { createRigidTransformModel } from '../rigidTransform/createRigidTransformModel';
-import { getEuclidianDistance } from '../rigidTransform/getEuclidianDistance';
-import { getRigidTransformArray } from '../rigidTransform/getRigidTransform';
+import { affineFitFunction } from '../toMigrate/forImageJs/affineFitFunction';
+import { applyAffineTransfom } from '../toMigrate/forImageJs/applyAffineTransform';
+import { createAffineTransformModel } from '../toMigrate/forImageJs/createAffineTransformModel';
 import { drawResult } from '../toMigrate/forImageJs/drawResult';
+import { getEuclidianDistance } from '../toMigrate/forImageJs/getEuclidianDistance';
 import { line, linearRegression } from '../utils/linearRegression';
 import { parabola, parabolaRegression } from '../utils/parabola';
 
@@ -197,8 +197,8 @@ describe('2D data (points)', () => {
 
     const result = ransac(source, destination, {
       distanceFunction: getEuclidianDistance,
-      modelFunction: createRigidTransformModel,
-      fitFunction: getRigidTransformArray,
+      modelFunction: createAffineTransformModel,
+      fitFunction: affineFitFunction,
     });
 
     expect(result.modelParameters).toStrictEqual([180, 0, 4]);
@@ -223,8 +223,8 @@ describe('2D data (points)', () => {
 
     const result = ransac(source, destination, {
       distanceFunction: getEuclidianDistance,
-      modelFunction: createRigidTransformModel,
-      fitFunction: getRigidTransformArray,
+      modelFunction: createAffineTransformModel,
+      fitFunction: affineFitFunction,
     });
 
     expect(result.modelParameters).toStrictEqual([180, 0, 4]);
@@ -249,14 +249,14 @@ describe('2D data (points)', () => {
     ];
     const result = ransac(source, destination, {
       distanceFunction: getEuclidianDistance,
-      modelFunction: createRigidTransformModel,
-      fitFunction: getRigidTransformArray,
+      modelFunction: createAffineTransformModel,
+      fitFunction: affineFitFunction,
     });
 
     expect(result.modelParameters).toBeDeepCloseTo([180, 9, 2]);
 
-    const model = createRigidTransformModel(result.modelParameters);
-    const resultPoints = applyRigidTransfom(source, model);
+    const model = createAffineTransformModel(result.modelParameters);
+    const resultPoints = applyAffineTransfom(source, model);
 
     expect(resultPoints).toBeDeepCloseTo(destination);
 
@@ -287,14 +287,14 @@ describe('2D data (points)', () => {
     ];
     const result = ransac(source, destination, {
       distanceFunction: getEuclidianDistance,
-      modelFunction: createRigidTransformModel,
-      fitFunction: getRigidTransformArray,
+      modelFunction: createAffineTransformModel,
+      fitFunction: affineFitFunction,
     });
 
     expect(result.modelParameters).toBeDeepCloseTo([-90, 0, 0]);
 
-    const model = createRigidTransformModel(result.modelParameters);
-    const resultPoints = applyRigidTransfom(source, model);
+    const model = createAffineTransformModel(result.modelParameters);
+    const resultPoints = applyAffineTransfom(source, model);
 
     expect(resultPoints).toBeDeepCloseTo(destination);
 

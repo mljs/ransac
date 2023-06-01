@@ -9,7 +9,7 @@ import { Point } from './getMatrixFromPoints';
  * @param model - The transformation function.
  * @returns The transformed points.
  */
-export function applyRigidTransfom(
+export function applyAffineTransfom(
   points: Point[],
   model: ModelFunction<Point>,
 ): Point[] {
