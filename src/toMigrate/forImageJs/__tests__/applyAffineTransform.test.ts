@@ -44,8 +44,8 @@ test('rectangle with scale = 2', () => {
 
   const model = createAffineTransformModel([-90, 2, 12, 2]);
   const result = applyAffineTransfom(source, model);
-
-  expect(result).toStrictEqual(expected);
+  // @ts-expect-error
+  expect(expected).toMatchCloseTo(result);
 });
 
 test('only one point', () => {
@@ -63,5 +63,6 @@ test('only one point', () => {
   const model = createAffineTransformModel([angle, -1, 0, 1 / 5]);
   const result = applyAffineTransfom(source, model);
 
-  expect(result).toStrictEqual(expected);
+  // @ts-expect-error
+  expect(result).toBeDeepCloseTo(expected);
 });

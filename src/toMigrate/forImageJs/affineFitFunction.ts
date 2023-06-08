@@ -19,5 +19,10 @@ export function affineFitFunction(
   const sourceMatrix = getMatrixFromPoints(source);
   const destinationMatrix = getMatrixFromPoints(destination);
   const result = getAffineTransform(sourceMatrix, destinationMatrix);
-  return [result.rotation, result.translation.x, result.translation.y];
+  return [
+    result.rotation,
+    result.translation.x,
+    result.translation.y,
+    result.scale,
+  ];
 }
