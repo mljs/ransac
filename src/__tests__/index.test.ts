@@ -201,7 +201,7 @@ describe('2D data (points)', () => {
       fitFunction: affineFitFunction,
     });
 
-    expect(result.modelParameters).toStrictEqual([180, 0, 4]);
+    expect(result.modelParameters).toStrictEqual([180, 0, 4, 1]);
   });
   it('6 points with outliers', () => {
     const source = [
@@ -227,9 +227,10 @@ describe('2D data (points)', () => {
       fitFunction: affineFitFunction,
     });
 
-    expect(result.modelParameters).toStrictEqual([180, 0, 4]);
+    expect(result.modelParameters).toStrictEqual([180, 0, 4, 1]);
     expect(result.inliers).toStrictEqual([1, 3, 4, 5]);
   });
+
   test('polygon rotated 180 degrees', () => {
     const source = [
       { column: 4, row: 3 },
@@ -253,7 +254,7 @@ describe('2D data (points)', () => {
       fitFunction: affineFitFunction,
     });
 
-    expect(result.modelParameters).toBeDeepCloseTo([180, 9, 2]);
+    expect(result.modelParameters).toBeDeepCloseTo([180, 9, 2, 1]);
 
     const model = createAffineTransformModel(result.modelParameters);
     const resultPoints = applyAffineTransfom(source, model);
@@ -291,7 +292,7 @@ describe('2D data (points)', () => {
       fitFunction: affineFitFunction,
     });
 
-    expect(result.modelParameters).toBeDeepCloseTo([-90, 0, 0]);
+    expect(result.modelParameters).toBeDeepCloseTo([-90, 0, 0, 1]);
 
     const model = createAffineTransformModel(result.modelParameters);
     const resultPoints = applyAffineTransfom(source, model);
