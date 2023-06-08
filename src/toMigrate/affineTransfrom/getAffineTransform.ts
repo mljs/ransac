@@ -18,8 +18,8 @@ export interface AffineTransform {
  * Get best rotation and translation of source points to destination points.
  * Based on {@link https://nghiaho.com/?page_id=671}
  *
- * @param source - Source points as a 3xN matrix. Third dimension must be padded with zeros.
- * @param destination - Destination points as a 3xN matrix. Third dimension must be padded with zeros.
+ * @param source - Source points as a 3xN matrix. Third dimension must be padded with ones.
+ * @param destination - Destination points as a 3xN matrix. Third dimension must be padded with ones.
  * @returns The affine transformation.
  */
 export function getAffineTransform(
