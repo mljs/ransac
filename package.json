@@ -1,5 +1,5 @@
 {
-  "name": "ml-ml-ransac",
+  "name": "ml-ransac",
   "version": "0.0.0",
   "description": "Fit a model to noisy data by excluding outliers. This is an implementation of the RANSAC algorithm.",
   "main": "./lib/index.js",
@@ -29,12 +29,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mljs/ml-ransac.git"
+    "url": "git+https://github.com/mljs/ransac.git"
   },
   "bugs": {
-    "url": "https://github.com/mljs/ml-ransac/issues"
+    "url": "https://github.com/mljs/ransac/issues"
   },
-  "homepage": "https://github.com/mljs/ml-ransac#readme",
+  "homepage": "https://github.com/mljs/ransac#readme",
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.21.2",
     "@babel/preset-typescript": "^7.21.0",
