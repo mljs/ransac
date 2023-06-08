@@ -229,4 +229,24 @@ describe('scale different from 1', () => {
       rotation: -90,
     });
   });
+
+  it('scale = 0.5', () => {
+    const source = new Matrix([
+      [1, 5, 5, 1],
+      [-4, -4, -2, -2],
+      [1, 1, 1, 1],
+    ]);
+    const destination = new Matrix([
+      [0.5, 2.5, 2.5, 0.5],
+      [-2, -2, -1, -1],
+      [1, 1, 1, 1],
+    ]);
+    const result = getAffineTransform(source, destination);
+
+    expect(result).toBeDeepCloseTo({
+      translation: { x: 0, y: 0 },
+      scale: 0.5,
+      rotation: 0,
+    });
+  });
 });
