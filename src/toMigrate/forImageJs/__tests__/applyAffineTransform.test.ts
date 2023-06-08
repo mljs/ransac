@@ -44,8 +44,7 @@ test('rectangle with scale = 2', () => {
 
   const model = createAffineTransformModel([-90, 2, 12, 2]);
   const result = applyAffineTransfom(source, model);
-  // @ts-expect-error
-  expect(expected).toMatchCloseTo(result);
+  expect(expected).toStrictEqual(result);
 });
 
 test('only one point', () => {
@@ -62,7 +61,6 @@ test('only one point', () => {
 
   const model = createAffineTransformModel([angle, -1, 0, 1 / 5]);
   const result = applyAffineTransfom(source, model);
-
-  // @ts-expect-error
+  // @ts-expect-error: jest matcher types are wrong
   expect(result).toBeDeepCloseTo(expected);
 });
