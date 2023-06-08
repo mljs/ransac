@@ -35,11 +35,11 @@ test('first rectangle', () => {
   expect(result.to2DArray()).toStrictEqual([[3], [-3], [0]]);
 });
 
-test('first rectangle', () => {
+test('second rectangle', () => {
   const points = new Matrix([
     [-6, -6, -2, -2],
     [10, 2, 2, 10],
-    [0, 0, 0, 0],
+    [1, 1, 1, 1],
   ]);
 
   const result = getCentroid(points);
