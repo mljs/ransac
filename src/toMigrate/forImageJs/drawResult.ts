@@ -1,4 +1,4 @@
-import { Point, Image, ImageColorModel, Mask, writeSync } from 'image-js';
+import { Point, Image, ImageColorModel, Mask } from 'image-js';
 
 /**
  * Draw source, destination and transformed points on an image.
@@ -34,11 +34,8 @@ export function drawResult(
 
   // draw points: source (green), destination (blue), result (red)
   drawBlendedPoints(source, [null, 255, null]);
-  writeSync(`${__dirname}/source.png`, image);
   drawBlendedPoints(destination, [null, null, 255]);
-  writeSync(`${__dirname}/destination.png`, image);
   drawBlendedPoints(result, [255, null, null]);
-  writeSync(`${__dirname}/result.png`, image);
 
   return image;
 
@@ -48,7 +45,6 @@ export function drawResult(
       color: [1],
       origin: { row: center, column: center },
     });
-    writeSync(`${__dirname}/mask.png`, withPoints);
     image.paintMask(withPoints, {
       out: image,
       color,
