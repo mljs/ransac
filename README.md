@@ -77,11 +77,11 @@ const result = ransac(source, destination, {
 
 [MIT](./LICENSE)
 
-[npm-image]: https://img.shields.io/npm/v/ml-ml-ransac.svg
-[npm-url]: https://www.npmjs.com/package/ml-ml-ransac
-[ci-image]: https://github.com/mljs/ml-ransac/workflows/Node.js%20CI/badge.svg?branch=main
-[ci-url]: https://github.com/mljs/ml-ransac/actions?query=workflow%3A%22Node.js+CI%22
-[codecov-image]: https://img.shields.io/codecov/c/github/mljs/ml-ransac.svg
-[codecov-url]: https://codecov.io/gh/mljs/ml-ransac
-[download-image]: https://img.shields.io/npm/dm/ml-ml-ransac.svg
-[download-url]: https://www.npmjs.com/package/ml-ml-ransac
+[npm-image]: https://img.shields.io/npm/v/ml-ransac.svg
+[npm-url]: https://www.npmjs.com/package/ml-ransac
+[ci-image]: https://github.com/mljs/ransac/workflows/Node.js%20CI/badge.svg?branch=main
+[ci-url]: https://github.com/mljs/ransac/actions?query=workflow%3A%22Node.js+CI%22
+[codecov-image]: https://img.shields.io/codecov/c/github/mljs/ransac.svg
+[codecov-url]: https://codecov.io/gh/mljs/ransac
+[download-image]: https://img.shields.io/npm/dm/ml-ransac.svg
+[download-url]: https://www.npmjs.com/package/ml-ransac
