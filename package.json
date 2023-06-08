@@ -45,6 +45,7 @@
     "image-js": "0.0.0-next-4d1cb272ce",
     "jest": "^29.5.0",
     "jest-matcher-deep-close-to": "^3.0.2",
+    "ml-levenberg-marquardt": "^4.1.2",
     "prettier": "^2.8.6",
     "rimraf": "^4.4.1",
     "ts-jest": "^29.1.0",
@@ -52,7 +53,6 @@
   },
   "dependencies": {
     "ml-array-median": "^1.1.6",
-    "ml-levenberg-marquardt": "^4.1.0",
     "ml-matrix": "^6.10.4",
     "ml-random": "^0.5.0"
   }
